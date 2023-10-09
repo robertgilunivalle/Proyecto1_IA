@@ -1,4 +1,4 @@
-# Mario_Smart_IA
+# Bombero inteligente
 
 Proyecto de la asignatura de **Inteligencia Artificial**, séptimo semestre de Ingenieria de Sistemas en la Universidad del Valle.
 
