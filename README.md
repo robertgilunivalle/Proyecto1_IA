@@ -1,10 +1,8 @@
 # Mario_Smart_IA
 
-Proyecto de la asignatura de **Inteligencia Artificial**, séptimo semestre de Ingenieria de Sistemas en la Universidad del Valle, Colombia.
+Proyecto de la asignatura de **Inteligencia Artificial**, séptimo semestre de Ingenieria de Sistemas en la Universidad del Valle.
 
-Consiste en una matriz de juego donde un agente inteligente tiene como objetivo llegar a la meta evitando obstáculos y recolectando poderes.
-
-> Podrás usar la aplicación [aquí](https://mario-smart-ia.vercel.app/).
+Consiste en una matriz de juego donde un agente inteligente tiene como objetivo llegar a la meta evitando obstáculos y haciendo misiones.
 
 ## Algoritmos de búsqueda
 
@@ -21,27 +19,32 @@ El agente inteligente encuentra la meta usando los siguientes algoritmos de bús
 - Avara.
 - A\*.
 
-> Puedes consultar los algoritmos de búsqueda mencionados anteriormente en internet.
-
 ## Especificaciones
 
-Mario buscará a la princesa de 5 formas diferentes (algoritmos de búsqueda).
+### Problema del bombero inteligente
 
-- Pasar por una casilla en blanco, una casilla que contenga un poder o encontrar a la princesa tendrá un costo de **1**.
+- consiste en un agente que se encarga de apagar dos puntos de fuego en un mundo donde se cuenta con dos cubetas 
 
-- Pasar por una casilla que contenga un koopa, sin tener poderes activos tendrá un costo de **6**.
+- una de 1 litro y la otra de 2 litros, y un solo hidrante. Se puede suponer que cada punto de fuego se apaga con un litro de agua. 
 
-- Cuando tomamos un poder, este tendrá efecto a partir de la siguiente casilla.
+- El bombero debe inicialmente encontrar una de las dos cubetas, luego dirigirse al hidrante, y finalmente proceder a encontrar los puntos de fuego. 
 
-- Al tomar una flor se le otorgará a Mario una bola de fuego con la que podrá reducir el costo de pasar por un koopa de **6** a **1**. El costo de pasar por una casilla seguirá siendo **1**.
+- En caso de que haya tomado la cubeta de un solo litro deberá recargarla nuevamente. 
 
-- Al tomar una estrella las casillas pasarán de tener un costo de **1** a **0.5**, durante 6 movimientos.
+- El bombero no puede tomar las dos cubetas.
 
-- Pasar por una casilla que contenga un koopa, mientras Mario tenga el poder de la flor, tendrá un costo de **1**.
+- Tenga en cuenta que si el agente pasa sobre un punto de fuego teniendo agua, éste se apagará automáticamente, es decir, no se puede decidir entre utilizar el agua o conservarla. Además, el agente
+no puede pasar por un punto de fuego si no lleva agua. 
 
-- Pasar por una casilla que contenga un koopa, mientras Mario tenga el poder de la estrella, tendrá un costo de **0.5**.
+- En cada exploración el agente podrá realizar desplazamientos simples como moverse arriba, abajo, izquierda, y derecha. 
 
-- Los poderes se pueden acumular, pero Mario no podrá tomar una flor mientras tenga el poder de una estrella y viceversa.
+- El costo de cada movimiento realizado por el agente cuando no lleva ningún suministro de agua es de **1**. 
+
+- Llevar una cubeta vacía no tiene costo adicional. Sin embargo, cuando se lleva agua en una cubeta, el costo de cada movimiento se aumenta en 1 por cada litro de agua. Por lo tanto, si el agente lleva la cubeta de 1 litro con agua, el costo de cada movimiento será de 2, si lleva la cubeta de 2 litros con un litro de agua el costo de cada movimiento será de 2, y si lleva la cubeta de 2 litros con dos litros de agua el costo será de 3. 
+
+- Al llegar a un hidrante las cubetas se llenan automáticamente. Sin embargo, la cubeta de dos litros no se vuelve a recargar si se pasa nuevamente por el hidrante. 
+
+- La búsqueda termina cuando se apaguen los dos puntos de fuego. 
 
 ## Como usar la aplicación
 
@@ -49,11 +52,11 @@ Estando en la interfaz de juego, se te pedirá seleccionar un archivo de texto p
 
 Ejemplo:
 
-1 0 0 0 0 0 0 0 1 1<br> 0 3 1 1 0 1 1 0 0 1<br> 1 1 1 1 0 1 1 1 3 0<br> 0 0 0 0 0 1 1 1 1 0<br> 2 1 1 1 0 0 0 0 5 5<br> 0 0 0 1 0 1 1 1 1 5<br> 0 1 0 0 0 5 5 5 0 0<br> 0 1 1 0 1 1 1 1 1 0<br> 0 4 4 0 1 1 1 6 0 0<br> 1 1 1 1 1 1 1 0 1 1<br>
+0 0 0 1 1 0 0 0 0 0 <br> 0 1 0 1 1 0 1 1 1 1 <br> 0 1 0 2 0 0 0 0 0 1 <br> 0 1 0 1 1 1 1 1 0 0 <br> 5 0 0 6 4 0 0 1 0 1 <br> 0 1 1 1 1 1 0 1 0 1 <br> 3 0 0 0 2 0 0 1 0 1 <br> 0 1 0 1 1 1 1 1 0 1 <br> 0 1 0 0 0 0 0 1 0 1 <br> 0 1 0 1 1 1 0 0 0 0 <br>
 
 Donde los números representan:
 
-0 = Espacio en blanco, donde el agente puede pasar.<br> 1 = Muro, obstáculo donde el agente no podra pasar.<br> 2 = Mario, el agente inteligente.<br> 3 = Poder de estrella, dura 6 casillas.<br> 4 = Poder de flor, contiene 1 bola de fuego.<br> 5 = Koopa, enemigo del agente.<br> 6 = Princesa, el objetivo del agente.<br>
+0 = Si es una casilla libre. <br> 1 = Si es un obstáculo. <br> 2 = Si es un punto de fuego. <br> 3 = Si es la cubeta de un litro. <br> 4 = Si es la cubeta de dos litros. <br> 5 = Si es el punto de inicio. <br> 6 = Si es el hidrante. <br>
 
 ## Ejecución de la aplicación
 
