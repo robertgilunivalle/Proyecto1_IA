@@ -2,16 +2,18 @@ import Coordinate from "./Coordinate";
 import Mario from "./Mario";
 import Matrix from "./Matrix";
 import Node from "./Node";
+import fireFighther from "./Mario";
 import Solution from "./Solution";
 
 class SearchAlgorithms {
   static breadthFirstSearch(queue: Node[]) {
     new Mario(Matrix.findPlayer());
+    new fireFighther(Matrix.findPlayer());
 
-    let currentNode: Node = new Node(null, Mario.position, Matrix.matrix);
+    let currentNode: Node = new Node(null, fireFighther.position, Matrix.matrix);
 
     queue.push(currentNode);
-    while (queue.length && !currentNode.isPrincess()) {
+    while (queue.length && !currentNode.isWater1L()) {
       Solution.expandedNodes.push(queue.shift()!);
       if (!currentNode.isWall()) {
         //GO LEFT
@@ -58,6 +60,9 @@ class SearchAlgorithms {
     }
     Solution.staticPath = [...queue[0].path];
   }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
   static depthFirstSearch(queue: Node[]) {
     new Mario(Matrix.findPlayer());
 

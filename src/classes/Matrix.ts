@@ -5,6 +5,7 @@ import Mario from "./Mario";
 import { STAR_DEFAULT_DURATION, FLOWER_DEFAULT_SHOTS } from "./Mario";
 import Solution from "./Solution";
 import Node from "./Node";
+import fireFighter from "./fireFighter";
 
 const INITIAL_STAR_POWERUP = {
   isPowered: false,
@@ -15,8 +16,20 @@ const INITIAL_FLOWER_POWERUP = {
   shots: 0,
 };
 
+const INITIAL_STATE_WATER1 = {
+ isTaken: false,
+ capacity: 0,
+}
+
+const INITIAL_STATE_WATER2 = {
+  isTaken: false,
+  capacity: 0,
+ }
+
 let star = INITIAL_STAR_POWERUP;
 let flower = INITIAL_FLOWER_POWERUP;
+let water1 = INITIAL_STATE_WATER1;
+let water2 = INITIAL_STATE_WATER2;
 let unpoweredCoordinates: Coordinate[] = [];
 
 //TODO: Solve image rendering
@@ -25,7 +38,7 @@ class Matrix {
   static element: HTMLElement;
 
   constructor(matrix: string) {
-    const array: Object[] = matrix.split("\n") as Object[];
+    const array: Object[] = matrix.split("\r\n") as Object[];
     Matrix.matrix = array.map(a => a.split(" ")) as Object[][];
     Matrix.element = document.querySelector(".matrix")!;
     this.buildGame();
@@ -44,8 +57,8 @@ class Matrix {
           case OBJECTS.BLANK:
             game += `<span class="item c${rowIdx}-${itemIdx}"></span>`;
             break;
-          case OBJECTS.PLAYER:
-            game += `<img id="mario" class="item c${rowIdx}-${itemIdx}" src=${`/${item}.png`}/>`;
+          case OBJECTS.FIREFIGHTER:
+            game += `<img id="firefighter" class="item c${rowIdx}-${itemIdx}" src=${`/${item}.png`}/>`;
             break;
           default:
             game += `<img class="item c${rowIdx}-${itemIdx}" src=${`/${item}.png`}/>`;
@@ -62,59 +75,68 @@ class Matrix {
   }
 
   static updateGame(currentCoordinate: Coordinate, nextCoordinate: Coordinate) {
-    Mario.position = nextCoordinate;
+    fireFighter.position = nextCoordinate;
     const MarioElement = document.querySelector(`.c${currentCoordinate.x}-${currentCoordinate.y}`)! as HTMLImageElement;
     const span = document.createElement("span");
     span.classList.add("item");
     span.classList.add(`c${currentCoordinate.x}-${currentCoordinate.y}`);
 
-    if (Matrix.getObject(currentCoordinate) === Objects.BOWSER && !star.isPowered && !flower.isPowered) {
+    if (Matrix.getObject(currentCoordinate) === Objects.HYDRANT && !water1.isTaken && !water2.isTaken) {
       const currentImg = document.createElement("img");
       currentImg.classList.add("item");
       currentImg.classList.add(`c${currentCoordinate.x}-${currentCoordinate.y}`);
       currentImg.src = `/${OBJECTS.BOWSER}.png`;
       MarioElement.replaceWith(currentImg);
     } else if (
-      Matrix.getObject(currentCoordinate) === Objects.STAR &&
-      flower.isPowered &&
+      Matrix.getObject(currentCoordinate) === Objects.WATER1L &&
+      water1.isTaken &&
       unpoweredCoordinates.find(c => c.x === nextCoordinate.x && c.y === nextCoordinate.y)
     ) {
       const currentImg = document.createElement("img");
       currentImg.classList.add("item");
       currentImg.classList.add(`c${currentCoordinate.x}-${currentCoordinate.y}`);
-      currentImg.src = `/${OBJECTS.STAR}.png`;
+      currentImg.src = `/${OBJECTS.WATER1L}.png`;
       MarioElement.replaceWith(currentImg);
     } else if (
-      Matrix.getObject(currentCoordinate) === Objects.FLOWER &&
-      star.isPowered &&
+      Matrix.getObject(currentCoordinate) === Objects.WATER2L &&
+      water2.isTaken &&
       unpoweredCoordinates.find(c => c.x === nextCoordinate.x && c.y === nextCoordinate.y)
     ) {
       const currentImg = document.createElement("img");
       currentImg.classList.add("item");
       currentImg.classList.add(`c${currentCoordinate.x}-${currentCoordinate.y}`);
-      currentImg.src = `/${OBJECTS.FLOWER}.png`;
+      currentImg.src = `/${OBJECTS.WATER2L}.png`;
       MarioElement.replaceWith(currentImg);
     } else {
       MarioElement.replaceWith(span);
     }
     if (star.duration === 0) star.isPowered = false;
     if (flower.shots === 0) flower.isPowered = false;
+    if (water1.capacity=== 0) water1.isTaken = false;
+    if (water2.capacity=== 0) water2.isTaken = false;
 
     const nextMarioElement = document.querySelector(`.c${nextCoordinate.x}-${nextCoordinate.y}`)! as HTMLImageElement;
     const nextImg = document.createElement("img");
     nextImg.classList.add("item");
     nextImg.classList.add(`c${nextCoordinate.x}-${nextCoordinate.y}`);
 
-    if (Matrix.getObject(nextCoordinate) === OBJECTS.PRINCESS) {
-      nextImg.src = `/goal.png`;
-    } else if (star.isPowered) {
-      nextImg.src = `/2-star.png`;
-      star.duration -= 1;
-    } else if (flower.isPowered) {
-      nextImg.src = `/2-flower.png`;
-      if (Matrix.getObject(nextCoordinate) === OBJECTS.BOWSER) flower.shots -= 1;
+    if (Matrix.getObject(nextCoordinate) === OBJECTS.FIRE) {
+      nextImg.src = `/3-vacia.png`;
+    }  else if (water1.isTaken) {
+      nextImg.src = `/3.png`;
+      if (Matrix.getObject(nextCoordinate) === OBJECTS.FIRE) water1.capacity -= 1;
     } else {
-      nextImg.src = `/${OBJECTS.PLAYER}.png`;
+      nextImg.src = `/${OBJECTS.FIREFIGHTER}.png`;
+    }
+    
+
+    if (Matrix.getObject(nextCoordinate) === OBJECTS.FIRE) {
+      nextImg.src = `/4-vacia.png`;
+    }  else if (water1.isTaken) {
+      nextImg.src = `/4.png`;
+      if (Matrix.getObject(nextCoordinate) === OBJECTS.FIRE) water2.capacity -= 2;
+    } else {
+      nextImg.src = `/${OBJECTS.FIREFIGHTER}.png`;
     }
 
     switch (Matrix.getObject(nextCoordinate)) {
@@ -207,7 +229,7 @@ class Matrix {
     let playerPosition: Coordinate;
     Matrix.matrix.forEach((row, rowIdx) => {
       row.forEach((item, itemIdx) => {
-        if (item !== Objects.PLAYER) return;
+        if (item !== Objects.FIREFIGHTER) return;
         playerPosition = new Coordinate(rowIdx, itemIdx);
       });
     });

@@ -1,6 +1,7 @@
 import OBJECTS from "../constants/objects";
 import Mario from "./Mario";
 import Node from "./Node";
+import fireFighter from "./fireFighter";
 class Solution {
   private static _cost: number = 0;
   private static _solution: Node[] = [];
@@ -68,27 +69,28 @@ class Solution {
   static buildNodeCost(node: Node): void {
     switch (node.object) {
       case OBJECTS.BLANK:
-        node.cost += Mario.hasStar() ? 0.5 : 1;
+        node.cost += fireFighter.hasWater1L() ? 2 : 1;
+        node.cost += fireFighter.hasWater2L() ? 3 : 1;
         break;
-      case OBJECTS.BOWSER:
-        if (Mario.hasStar()) {
-          node.cost += 0.5;
-        } else if (Mario.hasFlower()) {
-          node.cost += 1;
-        } else {
+      case OBJECTS.WATER1L:
+        if (fireFighter.hasWater1L()) {
+          node.cost -= 1;
+        } 
+        if (fireFighter.hasWater2L()) {
+          node.cost -= 1;
+        }  else {
           node.cost += 6;
         }
         break;
-      case OBJECTS.STAR:
-        node.cost += Mario.hasStar() ? 0.5 : 1;
-        Mario.foundStarPowerUp();
+
+      case OBJECTS.WATER1L:
+        node.cost += fireFighter.hasWater1L() ? 2 : 1;
+        fireFighter.foundFireWater1L;
         break;
-      case OBJECTS.FLOWER:
-        node.cost += Mario.hasStar() ? 0.5 : 1;
-        Mario.foundFlowerPowerUp();
+      case OBJECTS.WATER2L:
+        node.cost += fireFighter.hasWater2L() ? 3 : 1;
+        fireFighter.foundFireWater2L();
         break;
-      case OBJECTS.PRINCESS:
-        node.cost += Mario.hasStar() ? 0.5 : 1;
       default:
         node.cost += 0;
         break;

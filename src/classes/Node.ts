@@ -3,7 +3,7 @@ import type { Object } from "../constants/objects";
 import OBJECTS from "../constants/objects";
 import Coordinate from "./Coordinate";
 import Matrix from "./Matrix";
-import { FLOWER_DEFAULT_SHOTS, STAR_DEFAULT_DURATION } from "./Mario";
+import { FLOWER_DEFAULT_SHOTS, STAR_DEFAULT_DURATION, WATER1L, WATER2L } from "./Mario";
 class Node {
   father: Node | null = null;
   path: Node[] = [];
@@ -16,25 +16,41 @@ class Node {
   star: { isPowered: boolean; durationLeft: number } = { isPowered: false, durationLeft: 0 };
   flower: { isPowered: boolean; shotsLeft: number } = { isPowered: false, shotsLeft: 0 };
 
+
+  water1: { capacity: number, isTaken: boolean, } = {capacity: 0 , isTaken: false}
+  water2: { capacity: number, isTaken: boolean, } = {capacity: 0 , isTaken: false}
+
+
   constructor(father: Node | null, position: Coordinate, gameState: string[][]) {
     this.position = position;
     this.gameState = gameState;
     this.object = Matrix.matrix[position.x][position.y] as Object;
     this.father = father;
     if (father) {
-      this.star = { ...this.father!.star };
-      this.flower = { ...this.father!.flower };
+      this.water1 = { ...this.father!.water1 };
+      this.water2 = { ...this.father!.water2 };
+
       let cost = COSTS[this.object];
-      if (this.hasStar()) {
-        cost = 0.5;
-        this.star.durationLeft--;
-      } else if (this.hasFlower() && this.isBowser()) {
-        this.flower.shotsLeft--;
+
+      if (this.hasWater1L() && this.isFire()) {
+        this.water1.capacity--;
+        cost = 1;
+      } if (this.hasWater2L() && this.isFire()) {
+        this.water2.capacity--;
         cost = 1;
       }
+
       this.accumulatedCost = father.accumulatedCost + cost;
       this.path = [...father.path];
       this.depth = father.depth + 1;
+    }
+    if (this.isWater1LInPath() && !this.hasWater1L()) {
+      this.water1.isTaken = true;
+      this.water1.capacity += WATER1L;
+    }
+    if (this.isWater2LInPath() && !this.hasWater2L()) {
+      this.water2.isTaken = true;
+      this.water2.capacity += WATER2L;
     }
     if (this.isStarInPath() && !this.hasFlower()) {
       this.star.isPowered = true;
@@ -46,6 +62,8 @@ class Node {
     }
     if (this.star.durationLeft === 0) this.star.isPowered = false;
     if (this.flower.shotsLeft === 0) this.flower.isPowered = false;
+    if (this.water1.capacity === 0) this.water1.isTaken = false;
+    if (this.water2.capacity === 0) this.water2.isTaken = false;
     this.path.push(this);
   }
 
@@ -63,6 +81,17 @@ class Node {
 
   public isStar(): boolean {
     return this.object === OBJECTS.STAR;
+  }
+  public isFire(): boolean {
+    return this.object === OBJECTS.FIRE;
+  }
+
+  public isWater1L(): boolean {
+    return this.object === OBJECTS.WATER1L;
+  }
+
+  public isWater2L(): boolean {
+    return this.object === OBJECTS.WATER2L;
   }
 
   public isFlower(): boolean {
@@ -83,6 +112,23 @@ class Node {
 
   public hasFlower(): boolean {
     return this.flower.isPowered;
+  }
+
+  public hasWater1L(): boolean {
+    return this.water1.isTaken;
+  }
+  public hasWater2L(): boolean {
+    return this.water2.isTaken;
+  }
+  public isHydrant(): boolean {
+    return this.object === OBJECTS.HYDRANT;
+  }
+
+  public isWater1LInPath(): boolean {
+    return this.isWater1L() && !this.path.find(n => n.position.x === this.position.x && n.position.y === this.position.y);
+  }
+  public isWater2LInPath(): boolean {
+    return this.isWater2L() && !this.path.find(n => n.position.x === this.position.x && n.position.y === this.position.y);
   }
 
   public isStarInPath(): boolean {
